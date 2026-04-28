@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Ante</title>
+  <title>Webster's Game</title>
   <style>
     :root {
       --bg: #070816;
@@ -1238,7 +1238,7 @@
       <section class="card hero-card">
         <span class="pill">Permanent progression</span>
         <h2>Rebirth</h2>
-        <p class="hint">Rebirthing resets your balance back to $100 but gives a permanent earning bonus. First rebirth requires $25,000 and gives a 1.5x bonus.</p>
+        <p class="hint">Rebirthing resets your balance back to $100 but gives a permanent earning bonus. First rebirth requires $10,000 and gives a 1.5x bonus.</p>
         <div class="two-grid">
           <div class="mini-stat"><span class="label">Current Rebirths</span><b id="rebirthCount">0</b></div>
           <div class="mini-stat"><span class="label">Current Bonus</span><b id="rebirthBonus">1.0x</b></div>
@@ -1254,7 +1254,7 @@
           <div class="card-head"><h2>Admin Access</h2><span class="label">Email Locked</span></div>
           <div class="card-body controls" id="adminGate">
             <p class="hint">Log in with the approved admin email to unlock dev tools.</p>
-            <p class="hint"><b>Admin email:</b> ? </p>
+            <p class="hint"><b>Admin email:</b> koby.webster5113@gmail.com</p>
           </div>
         </section>
 
@@ -1588,7 +1588,7 @@
     };
     let snake, dir, nextDir, apple, score, activeBet, multiplier, gameTimer, running, paused, speedMs, particles = [];
     const curves = {
-      easy: [0.1, 0.15, 0.2, 0.25, 0.30, 0.35, 0.40, 0.45, 0.5, 0.60, 0.70, 0.85, 1.0, 1.15, 1.3, 1.45, 1.6, 1.75, 1.85, 2.0, 2.15, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.75, 4.0, 4.25, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 10.0, 100.0],
+      easy: [0.1, 0.15, 0.2, 0.28, 0.36, 0.45, 0.55, 0.68, 0.82, 1.0, 1.2, 1.45, 1.75, 2.1, 2.5, 3.0, 3.6],
       normal: [0.1, 0.15, 0.2, 0.28, 0.36, 0.45, 0.55, 0.68, 0.82, 1.0, 1.2, 1.45, 1.75, 2.1, 2.5, 3.0, 3.6],
       hard: [0.1, 0.15, 0.2, 0.28, 0.36, 0.45, 0.55, 0.68, 0.82, 1.0, 1.2, 1.45, 1.75, 2.1, 2.5, 3.0, 3.6],
       extraHard: [0.1, 0.15, 0.2, 0.28, 0.36, 0.45, 0.55, 0.68, 0.82, 1.0, 1.2, 1.45, 1.75, 2.1, 2.5, 3.0, 3.6]
@@ -1642,6 +1642,60 @@
       try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || {}; }
       catch { return {}; }
     }
+    
+function canAfford(amount){
+  amount = Math.floor(Number(amount||0));
+  if (Number(state.balance||0) <= 0 || amount > Number(state.balance||0)){
+    showNoMoneyPop();
+    return false;
+  }
+  return true;
+}
+
+
+    function hasEnoughMoney(amount) {
+      const needed = Math.max(1, Math.floor(Number(amount || 1)));
+      const bal = Math.max(0, Number(state.balance || 0));
+      if (bal <= 0 || needed > bal) {
+        showNoMoneyPop();
+        return false;
+      }
+      return true;
+    }
+
+    function chargeBet(amount) {
+      const needed = Math.max(1, Math.floor(Number(amount || 1)));
+      if (!hasEnoughMoney(needed)) return false;
+      state.balance = Math.max(0, Number(state.balance || 0) - needed);
+      return true;
+    }
+
+    function showNoMoneyPop() {
+      const target =
+        els.cashPop ||
+        els.minesCashPop ||
+        els.hiloCashPop ||
+        els.diceCashPop ||
+        els.twentyoneCashPop ||
+        els.safeCashPop;
+
+      if (target) {
+        target.innerHTML = `
+          <div style="font-size:1.2rem;color:#ff5c8a;">NO MONEY LEFT</div>
+          <div style="font-size:1.55rem;color:#ff5c8a;">You need cash to play.</div>
+        `;
+        target.classList.remove("hidden");
+        void target.offsetWidth;
+        setTimeout(() => target.classList.add("hidden"), 1600);
+      }
+
+      toast("No money left. You need cash to play.", true);
+    }
+
+    function clampBalance() {
+      state.balance = Math.max(0, Number(state.balance || 0));
+    }
+
     function saveLocal() {
       localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
     }
@@ -1658,7 +1712,7 @@
         displayName,
         icon: profileIcons[state.equippedIcon]?.emoji || "",
         title: state.equippedTitle ? (titles[state.equippedTitle]?.name || "") : "",
-        balance: Number(state.balance || 0),
+        balance: Math.max(0, Number(state.balance || 0)),
         updatedAt: serverTimestamp()
       }, { merge: true });
     }
@@ -1678,7 +1732,7 @@
           displayName,
           icon: profileIcons[state.equippedIcon]?.emoji || "",
           title: state.equippedTitle ? (titles[state.equippedTitle]?.name || "") : "",
-          balance: Number(state.balance || 0),
+          balance: Math.max(0, Number(state.balance || 0)),
           rebirths: Number(state.rebirths || 0),
           rebirthMultiplier: Number(state.rebirthMultiplier || 1),
           bestRun: Number(state.bestRun || 0),
@@ -1702,7 +1756,7 @@
         displayName,
         icon: profileIcons[state.equippedIcon]?.emoji || "",
         title: state.equippedTitle ? (titles[state.equippedTitle]?.name || "") : "",
-        balance: Number(state.balance || 0),
+        balance: Math.max(0, Number(state.balance || 0)),
         rebirths: Number(state.rebirths || 0),
         rebirthMultiplier: Number(state.rebirthMultiplier || 1),
         bestRun: Number(state.bestRun || 0),
@@ -2188,17 +2242,17 @@
       easy: {
         bombs: 1,
         label: "Easy",
-        curve: [1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.5, 3.75, 4.0, 4.5, 5.0, 5.5, 6.0, 7.5, 10.0]
+        curve: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.75, 2.0, 2.25, 2.5, 3.0, 3.5, 5.0, 10.0]
       },
       medium: {
         bombs: 2,
         label: "Medium",
-        curve: [1.0, 1.1, 1.2, 1.35, 1.5, 1.75, 2.0, 2.25, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.5, 9.0, 10.0, 11.5, 13.0, 15.0, 20.0]
+        curve: [1.0, 1.2, 1.35, 1.55, 1.8, 2.1, 2.5, 3.0, 3.6, 4.4, 5.5, 7.0, 9.0, 12.0, 16.0]
       },
       hard: {
         bombs: 3,
         label: "Hard",
-        curve: [1.0, 1.1, 1.3, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 12.5, 15.0, 20.0, 25.0, 35.0, 50.0, 100.0]
+        curve: [1.0, 1.3, 1.6, 2.0, 2.5, 3.2, 4.1, 5.3, 7.0, 9.5, 13.0, 18.0, 25.0, 35.0, 50.0]
       }
     };
 
@@ -2331,12 +2385,9 @@
       if (minesRunning) return;
 
       minesBet = getMinesBet();
-      if (minesBet > state.balance) {
-        toast("Not enough balance for that Mines bet.", true);
-        return;
-      }
+      
 
-      state.balance -= minesBet;
+      if (!chargeBet(minesBet)) return;
       saveLocal();
       renderTop();
 
@@ -2440,7 +2491,7 @@
       }
 
       // Make the run start instantly. Save the deducted bet in the background.
-      state.balance -= activeBet;
+      if (!chargeBet(activeBet)) return;
       saveLocal();
 
       resetRunBoard();
@@ -3228,10 +3279,10 @@ function renderAdminVisibility() {
 
       slotsBet = getSlotsBet();
       if (slotsBet > state.balance) {
-        toast("Not enough balance for that Slots bet.", true);
+        showNoMoneyPop();
       }
 
-      state.balance -= slotsBet;
+      if (!chargeBet(slotsBet)) return;
       saveLocal();
       renderTop();
 
@@ -3335,7 +3386,7 @@ function renderAdminVisibility() {
       { rank: "10", value: 10 }, { rank: "J", value: 11 }, { rank: "Q", value: 12 },
       { rank: "K", value: 13 }
     ];
-    const hiloCurve = [1.0, 1.5, 2.0, 2.5, 3.5, 5.0, 7.5, 10.0, 15.0, 50.0, 75.0, 100.0];
+    const hiloCurve = [1.0, 1.5, 2.5, 3.5, 5.0, 7.5, 10.0, 25.0, 50.0, 100.0, 1000.0];
 
     function drawHiLoCard() {
       const r = hiloRanks[Math.floor(Math.random() * hiloRanks.length)];
@@ -3387,10 +3438,10 @@ function renderAdminVisibility() {
 
       hiloBet = getHiLoBet();
       if (hiloBet > state.balance) {
-        toast("Not enough balance for that Hi-Lo bet.", true);
+        showNoMoneyPop();
       }
 
-      state.balance -= hiloBet;
+      if (!chargeBet(hiloBet)) return;
       saveLocal();
       renderTop();
 
@@ -3432,9 +3483,22 @@ function renderAdminVisibility() {
         hiloRunning = false;
         playSound("crash");
         els.hiloResultText.textContent = `Wrong! ${oldText} → ${next.text}.`;
+        showHiLoLossPop(hiloBet);
         renderHiLo();
         await saveCloud().catch(err => console.warn("Hi-Lo loss save failed:", err));
       }
+    }
+
+    function showHiLoLossPop(amount) {
+      const pop = els.hiloCashPop || els.cashPop;
+      if (!pop) return;
+      pop.innerHTML = `
+        <div style="font-size:1.25rem;color:#ff5c8a;">HI-LO LOST</div>
+        <div style="font-size:1.9rem;color:#ff5c8a;">-${money(Math.abs(amount))}</div>
+      `;
+      pop.classList.remove("hidden");
+      void pop.offsetWidth;
+      setTimeout(() => pop.classList.add("hidden"), 1700);
     }
 
     async function cashoutHiLo() {
@@ -3541,14 +3605,14 @@ function renderAdminVisibility() {
 
       diceBet = getDiceBet();
       if (diceBet > state.balance) {
-        toast("Not enough balance for that Dice bet.", true);
+        showNoMoneyPop();
       }
 
       const mult = getDiceMultiplier();
       const roll = Math.floor(Math.random() * 6) + 1;
       const won = diceMode === "under" ? roll <= 3 : roll >= 4;
 
-      state.balance -= diceBet;
+      if (!chargeBet(diceBet)) return;
       els.diceRollNumber.textContent = roll;
       if (els.diceMarker) {
         const percent = ((roll - 1) / 5) * 100;
@@ -3670,10 +3734,10 @@ function renderAdminVisibility() {
 
       twentyoneBet = getTwentyOneBet();
       if (twentyoneBet > state.balance) {
-        toast("Not enough balance for that 21 bet.", true);
+        showNoMoneyPop();
       }
 
-      state.balance -= twentyoneBet;
+      if (!chargeBet(twentyoneBet)) return;
       playerCards21 = [drawCard21(), drawCard21()];
       dealerCards21 = [drawCard21(), drawCard21()];
       dealerHidden21 = true;
@@ -3791,7 +3855,7 @@ function showTwentyOneCashPop(amount) {
       easy: {
         label: "Easy",
         choices: 6,
-        multipliers: [0.25, 0.45, 0.7, 1.0, 1.35, 1.75, 2.25, 3.0, 4.0, 5.5, 7.5, 10.0, 15.0, 25.0, 50.0]
+        multipliers: [-0.25, -0.1, 0, 0.1, 0.25, 0.45, 0.7, 1.0, 1.35, 1.75, 2.25, 3.0, 4.0, 5.5, 7.5, 10.0, 15.0, 25.0, 50.0]
       },
       medium: {
         label: "Medium",
@@ -3870,12 +3934,12 @@ function showTwentyOneCashPop(amount) {
       if (safeRunning) return;
 
       safeBet = getSafeBet();
-      if (safeBet > state.balance) {
-        toast("Not enough balance for that Safe Cracker bet.", true);
+      if (safeBet > state.balance || Number(state.balance || 0) <= 0) {
+        showNoMoneyPop();
         return;
       }
 
-      state.balance -= safeBet;
+      if (!chargeBet(safeBet)) return;
       safeRunning = true;
       safeRound = 0;
       safeVault.textContent = "🔐";
@@ -4150,7 +4214,7 @@ function showTwentyOneCashPop(amount) {
   </script>
 
   <footer class="site-footer">
-    <span>Made By Koby Webster</span>
+    <span>made by Koby Webster</span>
     <span>EST 2026</span>
   </footer>
 
