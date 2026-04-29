@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Webster's Game</title>
+  <title>The Ante</title>
   <style>
     :root {
       --bg: #070816;
@@ -4200,7 +4200,7 @@ function showTwentyOneCashPop(amount) {
     let playerRoll = 0;
     let rollSpinTimer = null;
 
-    const rollCurve = [1.0, 1.15, 1.35, 1.6, 2.0, 2.5, 3.2, 4.2, 5.5, 7.5, 10.0, 15.0, 25.0, 50.0, 100.0];
+    const rollCurve = [1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.5, 10.0, 12.5, 25.0, 50.0, 100.0, 1000.0];
 
     function getRollBet() {
       const v = Math.floor(Number(els.rollBetInput.value || 1));
