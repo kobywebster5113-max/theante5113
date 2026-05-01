@@ -1743,7 +1743,7 @@
     function money(n) { return "$" + Math.round(Number(n) || 0).toLocaleString(); }
     function getBet() { return Math.max(1, Math.floor(Number(els.betInput.value) || 1)); }
     function getCurve() { return curves[els.riskMode.value] || curves.normal; }
-    const rebirthCosts = [10000000, 250000000, 125000000000, 12500000000000, 500000000000000000000];
+    const rebirthCosts = [250000, 7500000, 125000000, 5000000000, 500000000000000000];
     const maxRebirths = rebirthCosts.length;
 
     function getRebirthCost() {
