@@ -1664,6 +1664,7 @@
   </main>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
     import {
       getAuth,
       createUserWithEmailAndPassword,
@@ -1688,15 +1689,17 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     const firebaseConfig = {
-      apiKey: "AIzaSyDAs2gANfwrJpMOeFRf3RP35dtqEfv7RT4",
-      authDomain: "gambleco-22b52.firebaseapp.com",
-      projectId: "gambleco-22b52",
-      storageBucket: "gambleco-22b52.firebasestorage.app",
-      messagingSenderId: "372207229265",
-      appId: "1:372207229265:web:eb66a2b3e6153fe5505b70",
-      measurementId: "G-QMYWBJ8JMY"
+      apiKey: "AIzaSyActd7HoEL4NIfIHyAP_emu_SMEHvu8cjc",
+      authDomain: "sassythesquatch-5f7fe.firebaseapp.com",
+      databaseURL: "https://sassythesquatch-5f7fe-default-rtdb.firebaseio.com",
+      projectId: "sassythesquatch-5f7fe",
+      storageBucket: "sassythesquatch-5f7fe.firebasestorage.app",
+      messagingSenderId: "5671192875",
+      appId: "1:5671192875:web:df5fc701ac8856e55ddd6e",
+      measurementId: "G-43HHNB73GH"
     };
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const LOCAL_KEY = "webstersGameLocalBackup_v3";
@@ -5353,4 +5356,3 @@ if (els.hcSideShowBtn) els.hcSideShowBtn.addEventListener("click", showHighCard)
   </footer>
 
 </body>
-</html>
